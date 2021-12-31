@@ -45,6 +45,22 @@ var saveTasks = function() {
   localStorage.setItem("tasks", JSON.stringify(tasks));
 };
 
+// trash icon can be dropped onto
+$("#trash").droppable({
+  accept: ".card .list-group-item",
+  tolerance: "touch",
+  drop: function(event, ui) {
+    // remove dragged element from the dom
+    ui.draggable.remove();
+
+  },
+  over: function(event, ui) {
+    console.log(ui);
+  },
+  out: function(event, ui) {
+    console.log(ui);
+  }
+});
 
 // modal was triggered
 $("#task-form-modal").on("show.bs.modal", function() {
@@ -95,24 +111,22 @@ $(".list-group").on("click", "p", function() {
   textInput.trigger("focus");
 });
 
+
 // editable field was un-focused
 $(".list-group").on("blur", "textarea", function() {
-  // get the textarea's current value/text
-  var text = $(this)
-    .val()
-    .trim();
+  // get current value of textarea
+  var text = $(this).val();
 
-  // get the parent ul's id attribute
+  // get status type and position in the list
   var status = $(this)
-    .closest(".list-group") 
+    .closest(".list-group")
     .attr("id")
-    .replace("list_", "");
-
-  // get the task's position in the list of other li elements
+    .replace("list-", "");
   var index = $(this)
     .closest(".list-group-item")
     .index();
 
+  // update task in array and re-save to localstorage
   tasks[status][index].text = text;
   saveTasks();
 
@@ -121,7 +135,7 @@ $(".list-group").on("blur", "textarea", function() {
     .addClass("m-1")
     .text(text);
 
-  // replace textarea with p element
+  // replace textarea with new content
   $(this).replaceWith(taskP);
 });
 
@@ -213,8 +227,9 @@ $(".card .list-group").sortable({
       tempArr.push({
         text: text,
         date: date
-      })
-    });    
+      });
+    });  
+    console.log(tempArr);  
 
   // trim down list's ID to match object property
   var arrName = $(this)
@@ -222,7 +237,7 @@ $(".card .list-group").sortable({
   .replace("list-", "");
 
   // update array on tasks object and save
-  tasks[arrName = tempArr];
+  tasks[arrName] = tempArr;
   saveTasks();
   }
 });
